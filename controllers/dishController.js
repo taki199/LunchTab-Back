@@ -178,3 +178,56 @@ module.exports.updateDishCtrl = asyncHandler(async (req, res) => {
     }
 });
 
+/**------------------------------------------
+ *
+ *   @desc   delete dish
+ *   @route    /api/dishes/:id
+ *   @method Delete
+ *   @access private (only admin)
+----------------------------------------- */
+
+module.exports.deleteDishCtrl = asyncHandler(async (req, res) => {
+    // Find the category by ID
+    const Dish = await dish.findById(req.params.id);
+
+    // Check if the category exists
+    if (!Dish) {
+        return res.status(404).json({ message: 'Dish not found' });
+    }
+
+    // Remove the category from the database
+    await dish.findByIdAndDelete(req.params.id);
+
+    // Check if the category has an image associated with it
+    if (Dish.image && Dish.image.publicId) {
+        // Remove the image from Cloudinary
+        await cloudinaryRemoveImage(Dish.image.publicId);
+    }
+
+    // Return success message
+    res.status(200).json({ message: 'Dish has been deleted successfully', DishId: Dish._id });
+});
+
+/**------------------------------------------
+ *
+ *   @desc   find  dish by id
+ *   @route    /api/dishes/:id
+ *   @method get
+ *   @access public 
+----------------------------------------- */
+
+module.exports.getDishByIdCtrl = asyncHandler(async (req, res) => {
+    const Dish = await dish.findById(req.params.id).populate('category');
+
+    // Check if the dish exists
+    if (!Dish) {
+        return next([{ msg: "Dish not found" }]);
+    }
+
+    // Return the dish object
+    res.status(200).json(Dish);
+});
+
+
+
+

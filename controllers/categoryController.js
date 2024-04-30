@@ -3,6 +3,7 @@ const {Category,validateCreateCategory,validateUpdateCategory}=require("../model
 const path = require('path'); // Import the path module
 const fs=require("fs");
 const {cloudinaryUploadImage,cloudinaryRemoveImage, cloudinaryRemoveMultipleImage}=require('../utils/cloudinary');
+const { dish } = require('../models/Dish');
 
 /**------------------------------------------
  *
@@ -141,3 +142,47 @@ module.exports.updateCategoryCtrl = asyncHandler(async (req, res) => {
     // Return success message
     res.status(200).json({ message: 'Category updated successfully', category });
 });
+
+/**------------------------------------------
+ *  //api/categories/catId/dishes
+ *   @desc  get dishes of a category
+ *   @route    /api/categories/:categoryId/dishes
+ *   @method get
+ *   @access public 
+----------------------------------------- */
+
+module.exports.getDishesByCategoryCtrl=asyncHandler(async(req,res)=>{
+    try {
+        // Retrieve the category ID from the request parameters
+        const categoryId = req.params.categoryId;
+
+        // Find all dishes with the specified category ID
+        const dishes = await dish.find({ category: categoryId });
+
+        // Return the fetched dishes as a response
+        res.status(200).json(dishes);
+    } catch (error) {
+        // Handle any errors that occur during the process
+        console.error('Error fetching dishes by category:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+})
+
+/**------------------------------------------
+ *  
+ *   @desc  get single category
+ *   @route    /api/categories/:categoryId
+ *   @method get
+ *   @access public 
+----------------------------------------- */
+
+module.exports.getSingleCategoryCtrl=asyncHandler( async (req,res,next) =>{
+    const id = req.params.id
+    
+    // Get category using the provided ID
+    const category = await Category.findById(id)
+    
+    if(!category){
+        return next(new CustomError(`Category not found`,404))
+    }else res.status(200).json(category);
+})  

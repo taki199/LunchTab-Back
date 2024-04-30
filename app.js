@@ -19,10 +19,11 @@ app.use(cors({
 }))
 
 //routes
-
+ //app.use("/api/orders",require("./routes/orderRoute"));
  app.use("/api/auth",require("./routes/authRoute"))
  app.use("/api/users",require("./routes/usersRoute"));
  app.use("/api/customers",require("./routes/customersRout"));
+ 
 // app.use("/api/posts",require("./routes/postsRoute"));
 // app.use("/api/comments",require( "./routes/commentsRoute"));
 app.use("/api/categories",require( './routes/categoryRoute'));
