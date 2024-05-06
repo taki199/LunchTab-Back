@@ -15,7 +15,7 @@ const {cloudinaryUploadImage,cloudinaryRemoveImage, cloudinaryRemoveMultipleImag
 module.exports.getAllUsersCtrl = asyncHandler(async (req, res) => {
     const users = await User.find({ IsDeleted: false }).select("-password");
     if (users.length === 0) {
-        return res.status(404).json({ success: false, msg: "No active users found" });
+        return res.status(404).json({ success: false, msg: "No active users found"});
     }
     
     res.status(200).json({ success: true, data: users });

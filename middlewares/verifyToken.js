@@ -19,6 +19,7 @@ function verifyToken(req,res,next){
 }
 //verify token & admin
 function verifyTokenAndAdmin(req,res,next){
+    console.log('Request Headers:', req.headers);
     verifyToken(req,res,()=>{
         if(req.user.isAdmin ){
             next();

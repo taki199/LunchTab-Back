@@ -49,6 +49,7 @@ module.exports.getSingleDishCtrl = asyncHandler(async (req, res) => {
 ----------------------------------------- */
 
 module.exports.createDishCtrl = asyncHandler(async (req, res) => {
+
     // Validate the request body
     const { error } = validateCreateDish(req.body);
     if (error) {

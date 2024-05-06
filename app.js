@@ -19,7 +19,7 @@ app.use(cors({
 }))
 
 //routes
- //app.use("/api/orders",require("./routes/orderRoute"));
+ app.use("/api/orders",require("./routes/orderRoute"));
  app.use("/api/auth",require("./routes/authRoute"))
  app.use("/api/users",require("./routes/usersRoute"));
  app.use("/api/customers",require("./routes/customersRout"));
