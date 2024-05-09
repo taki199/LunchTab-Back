@@ -175,7 +175,13 @@ module.exports.deleteOrderCtrl = asyncHandler(async (req, res) => {
   // Get All Orders Controller
   module.exports.getAllOrdersCtrl = asyncHandler(async (req, res) => {
     try {
-        const orders = await Order.find().populate('customer', '-password -_id -email');
+        const orders = await Order.find()
+  .populate({
+    path: 'orderItems.dishId',
+    select: 'name', // Select only the 'name' field of the dish
+  })
+  .populate('customer', '-password -_id -email');
+
 
 
         res.status(200).json({ message: 'Orders retrieved successfully', orders });
