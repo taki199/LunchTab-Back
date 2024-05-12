@@ -14,7 +14,8 @@ const {cloudinaryUploadImage,cloudinaryRemoveImage, cloudinaryRemoveMultipleImag
 ----------------------------------------- */
 
 module.exports.getAllDishesCtrl = asyncHandler(async (req, res) => {
-    const dishes = await dish.find({ IsDeleted: false })
+    const dishes = await dish.find({ IsDeleted: false }).populate('category', 'name');
+
     if (dishes.length === 0) {
         return res.status(404).json({ success: false, msg: "No dishes  found" });
     }

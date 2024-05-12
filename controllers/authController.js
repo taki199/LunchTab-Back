@@ -14,26 +14,39 @@ const {Customer,validateLoginCustomer, validateRegisterCustomer}=require("../mod
  * 
 ----------------------------------------- */
 module.exports.registerUserCtrl=asyncHandler(async(req,res)=>{
-   const {error}=validateRegisterUser(req.body)
-   if (error) return res.status(400).json({message: error.details[0].message})
-   let user=await User.findOne({email: req.body.email});
-   if (user){
-    return res.status(400).json({message:'Email already in use'});
+   console.log("Received registration request:", req.body);
+
+   // Validate the request body
+   const { error } = validateRegisterUser(req.body);
+   if (error) {
+     console.log("Validation error:", error.details[0].message);
+     return res.status(400).json({ message: error.details[0].message });
    }
-
-   const salt=await bcrypt.genSalt(10);
-   const hashedPassword = await  bcrypt.hash(req.body.password,salt)
-
+ 
+   // Check if email is already in use
+   let user = await User.findOne({ email: req.body.email });
+   if (user) {
+     console.log("Email already in use:", req.body.email);
+     return res.status(400).json({ message: 'Email already in use' });
+   }
+ 
+   // Generate salt and hash password
+   const salt = await bcrypt.genSalt(10);
+   const hashedPassword = await bcrypt.hash(req.body.password, salt);
+ 
+   // Create a new user document
    user = new User({
-    username:req.body.username,
-    email:req.body.email,
-    password:hashedPassword,
+     username: req.body.username,
+     email: req.body.email,
+     password: hashedPassword,
    });
-
+ 
+   // Save the new user to the database
    await user.save();
-    // @TODO---- sending email (verify account if not verified )
-
-   res.status(201).json({message:"User created successfully" , data :{...user._doc}})
+ 
+   // Log success message and send response
+   console.log("User created successfully:", user);
+   res.status(201).json({ message: "User created successfully", data: { ...user._doc } });
 });
 
 /**------------------------------------------

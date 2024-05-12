@@ -9,6 +9,10 @@ const CategorySchema = new mongoose.Schema({
     trim: true,
     minlength: 3, // Minimum length for category name
   },
+  description:{
+  type:String,
+  minlength:10
+  },
   image: {
     type: Object,
     default: {
@@ -30,6 +34,7 @@ const Category = mongoose.model('Category', CategorySchema);
 function validateCreateCategory(obj) {
   const schema = Joi.object({
     name: Joi.string().required().label("Name").min(3).trim(),
+    description:Joi.string().label("Description").min(10).trim()
   });
   return schema.validate(obj);
 }
@@ -38,6 +43,7 @@ function validateCreateCategory(obj) {
 function validateUpdateCategory(obj) {
   const schema = Joi.object({
     name: Joi.string().required().label("Name").min(3).trim(),
+    description:Joi.string().label("Description").min(10).trim()
   });
   return schema.validate(obj);
 }

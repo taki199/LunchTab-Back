@@ -41,7 +41,8 @@ module.exports.createCategoryCtrl = asyncHandler(async (req, res) => {
     // Create the category
     const category = await Category.create({
         name: req.body.name,
-        image: categoryImage // Assign the category image
+        image: categoryImage, // Assign the category image
+        description:req.body.description
     });
 
    
