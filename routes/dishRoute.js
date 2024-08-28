@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { createDishCtrl,getAllDishesCtrl,getSingleDishCtrl,updateDishCtrl,deleteDishCtrl,getDishByIdCtrl } = require('../controllers/dishController.js');
+const { createDishCtrl,getAllDishesCtrl,getSingleDishCtrl,updateDishCtrl,deleteDishCtrl,getDishByIdCtrl,getDishCountCtrl } = require('../controllers/dishController.js');
 const { verifyTokenAndAdmin }=require('../middlewares/verifyToken')
 const photoUpload = require("../middlewares/photoUpload");
 const {validateObjectId}=require('../middlewares/validateObjectId')
@@ -10,6 +10,7 @@ const {validateObjectId}=require('../middlewares/validateObjectId')
 
 router.post( '/',verifyTokenAndAdmin,photoUpload.single("image"),createDishCtrl);
 router.get("/",getAllDishesCtrl)
+router.get('/my-count/my-dishes',getDishCountCtrl)
 
 
 // //api/dishes/:id

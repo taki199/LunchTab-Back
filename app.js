@@ -2,6 +2,10 @@ const express = require('express')
 const connectToDb = require('./config/connectToDb');
 const cors = require("cors");
 require("dotenv").config();
+const cookieParser = require('cookie-parser');
+const activityMiddleware = require('./middlewares/activityMiddleware');
+
+
 
 //connect to DB
 connectToDb();
@@ -12,11 +16,23 @@ const app = express()
 //Middlewares
 
 app.use(express.json());
+app.use(cookieParser());
+app.use(activityMiddleware);
+
 
 //Cors Policy
+const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
+
 app.use(cors({
-    origin:"http://localhost:3000"
-}))
+    origin: function (origin, callback) {
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true // Allow credentials (cookies)
+}));
 
 //routes
  app.use("/api/orders",require("./routes/orderRoute"));

@@ -58,34 +58,31 @@ module.exports.registerUserCtrl=asyncHandler(async(req,res)=>{
  * 
 ----------------------------------------- */
 
-module.exports.loginUserCtrl=asyncHandler(async(req,res)=>{
-    const {error}=validateLoginUser(req.body)
-   if (error) return res.status(400).json({message: error.details[0].message})
-   let user=await User.findOne({email: req.body.email});
-   if (!user){
-   return  res.status(400).json({message:'Invalid credentials'})
-   }
+module.exports.loginUserCtrl = asyncHandler(async (req, res) => {
+    const { error } = validateLoginUser(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
 
-   const isPasswordMatch =await bcrypt.compare(req.body.password, user.password)
-   if (!isPasswordMatch){
-    return  res.status(400).json({message:'Invalid credentials'})
+    let user = await User.findOne({ email: req.body.email });
+    if (!user) {
+        return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // @TODO---- sending email (verify account if not verified )
+    const isPasswordMatch = await bcrypt.compare(req.body.password, user.password);
+    if (!isPasswordMatch) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
-   const token=user.generateAuthToken();
+    const token = user.generateAuthToken();
 
-   res.status(200).json({
-    _id:user._id,
-    isAdmin:user.isAdmin,
-    profilePhoto:user.profilePhoto,
-    token,
-    username:user.username,
-   })
-    
-
+    res.cookie('authToken', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+    res.status(200).json({
+        _id: user._id,
+        isAdmin: user.isAdmin,
+        profilePhoto: user.profilePhoto,
+        username: user.username,
+        token :token,
+    });
 });
-
 
 /**------------------------------------------
  *
@@ -141,40 +138,29 @@ module.exports.registerCustomerCtrl = asyncHandler(async (req, res) => {
 * 
 ----------------------------------------- */
 module.exports.loginCustomerCtrl = asyncHandler(async (req, res) => {
-   // Validate the request body
-   const { error } = validateLoginCustomer(req.body);
-   if (error) {
-       return res.status(400).json({ message: error.details[0].message });
-   }
+    const { error } = validateLoginCustomer(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
 
-   try {
-       // Check if the user exists
-       let customer = await Customer.findOne({ email: req.body.email });
-       if (!customer) {
-           return res.status(400).json({ message: 'Invalid credentials' });
-       }
+    let customer = await Customer.findOne({ email: req.body.email });
+    if (!customer) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
-       // Verify the password
-       const isPasswordMatch = await bcrypt.compare(req.body.password, customer.password);
-       if (!isPasswordMatch) {
-           return res.status(400).json({ message: 'Invalid credentials' });
-       }
+    const isPasswordMatch = await bcrypt.compare(req.body.password, customer.password);
+    if (!isPasswordMatch) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
-       // @TODO: Send verification email if necessary
+    const token = customer.generateAuthToken();
 
-       // Generate authentication token
-       const token = customer.generateAuthToken();
-
-       // Return user data and token
-       res.status(200).json({
-           _id: customer._id,
-           isCustomer: customer.isCustomer,
-           profilePhoto: customer.profilePhoto,
-           token,
-           username: customer.username,
-       });
-   } catch (error) {
-       console.error('Error logging in customer:', error);
-       res.status(500).json({ message: 'Internal Server Error' });
-   }
+    res.cookie('authToken', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+    res.status(200).json({
+        _id: customer._id,
+        isCustomer: customer.isCustomer,
+        profilePhoto: customer.profilePhoto,
+        username: customer.username,
+        token :token,
+    });
 });

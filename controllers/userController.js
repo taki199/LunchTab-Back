@@ -147,45 +147,46 @@ module.exports.getUsersCountCtrl=asyncHandler(async(req,res)=>{
  *   @access private (only logged in user)
 ----------------------------------------- */
 
-module.exports.profilePhotoUploaderCtrl=asyncHandler(async(req,res)=>{
-    if(!req.file){
-        return res.status(400).json({message:'no file provided'})
+module.exports.profilePhotoUploaderCtrl = asyncHandler(async (req, res) => {
+    console.log("Received file:", req.file);
+  
+    if (!req.file) {
+      console.error("No file provided");
+      return res.status(400).json({ message: 'No file provided' });
     }
-    //get the path to the image
-    const imagePath=path.join(__dirname,`../images/${req.file.filename}`)
-    
-    //upload to cloudinary 
-    const result=await cloudinaryUploadImage(imagePath);
-    //get the user from Db
-    
-    const user =await User.findById(req.user.id);
-    
-
-   
-
-    //delete the old profile photo if exist
-    if(user.profilePhoto.publicId!==null){
-     await cloudinaryRemoveImage(user.profilePhoto.publicId);
+  
+    // Get the path to the image
+    const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
+  
+    // Upload to Cloudinary
+    const result = await cloudinaryUploadImage(imagePath);
+    console.log("Cloudinary upload result:", result);
+  
+    // Get the user from DB
+    const user = await User.findById(req.user.id);
+  
+    // Delete the old profile photo if it exists
+    if (user.profilePhoto && user.profilePhoto.publicId) {
+      await cloudinaryRemoveImage(user.profilePhoto.publicId);
     }
-
-    //change the profile photo filed in the db 
-    user.profilePhoto={
-        url:result.secure_url,
-        publicId:result.public_id
-    }
-
+  
+    // Update the profile photo field in the DB
+    user.profilePhoto = {
+      url: result.secure_url,
+      publicId: result.public_id
+    };
+    console.log("New profile photo URL:", result.secure_url);
+    console.log("New profile photo public ID:", result.public_id);
     await user.save();
-
-    res.status(200).json({message:"your profile photo uploaded successfully",
-    profilePhoto:{url:result.secure_url,publicId:result.public_id}
-});
-   //remove image from the server
-
-   fs.unlinkSync(imagePath);
-
-
-
-})
+  
+    res.status(200).json({
+      message: "Your profile photo uploaded successfully",
+      profilePhoto: { url: result.secure_url, publicId: result.public_id }
+    });
+  
+    // Remove image from the server
+    fs.unlinkSync(imagePath);
+  });
 
 /**------------------------------------------
  *

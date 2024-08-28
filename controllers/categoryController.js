@@ -1,10 +1,9 @@
-const asyncHandler=require("express-async-handler");
-const {Category,validateCreateCategory,validateUpdateCategory}=require("../models/Category")
-const path = require('path'); // Import the path module
-const fs=require("fs");
-const {cloudinaryUploadImage,cloudinaryRemoveImage, cloudinaryRemoveMultipleImage}=require('../utils/cloudinary');
-const { dish } = require('../models/Dish');
-
+const asyncHandler = require("express-async-handler");
+const { Category, validateCreateCategory, validateUpdateCategory } = require("../models/Category");
+const path = require('path');
+const fs = require("fs");
+const { cloudinaryUploadImage, cloudinaryRemoveImage } = require('../utils/cloudinary');
+const { Dish } = require('../models/Dish');
 /**------------------------------------------
  *
  *   @desc    Create New category
@@ -15,7 +14,6 @@ const { dish } = require('../models/Dish');
 
 
 module.exports.createCategoryCtrl = asyncHandler(async (req, res) => {
-    // Validate the request body
     const { error } = validateCreateCategory(req.body);
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
@@ -23,33 +21,24 @@ module.exports.createCategoryCtrl = asyncHandler(async (req, res) => {
 
     let categoryImage = null;
 
-    // Check if an image is provided in the request body
     if (req.file) {
-        // Get the path to the uploaded image
         const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
-
-        // Upload the image to Cloudinary
         const result = await cloudinaryUploadImage(imagePath);
-
-        // Set the category image properties
         categoryImage = {
             url: result.secure_url,
             publicId: result.public_id
         };
     }
 
-    // Create the category
     const category = await Category.create({
         name: req.body.name,
-        image: categoryImage, // Assign the category image
-        description:req.body.description
+        image: categoryImage,
+        description: req.body.description
     });
 
-   
-
-    // Return the created category in the response
     res.status(201).json(category);
 });
+
 
 
 
@@ -61,10 +50,10 @@ module.exports.createCategoryCtrl = asyncHandler(async (req, res) => {
  *   @access public 
 ----------------------------------------- */
 
-module.exports.getAllCategoriesCtrl=asyncHandler(async(req,res)=>{
-    const categories=await Category.find();
-     res.status(200).json(categories)
- });
+module.exports.getAllCategoriesCtrl = asyncHandler(async (req, res) => {
+    const categories = await Category.find({ IsDeleted: false });
+    res.status(200).json(categories);
+});
  
 /**------------------------------------------
  *
@@ -75,26 +64,21 @@ module.exports.getAllCategoriesCtrl=asyncHandler(async(req,res)=>{
 ----------------------------------------- */
 
 module.exports.deleteCategoriesCtrl = asyncHandler(async (req, res) => {
-    // Find the category by ID
     const category = await Category.findById(req.params.id);
 
-    // Check if the category exists
     if (!category) {
         return res.status(404).json({ message: 'Category not found' });
     }
 
-    // Remove the category from the database
     await Category.findByIdAndDelete(req.params.id);
 
-    // Check if the category has an image associated with it
     if (category.image && category.image.publicId) {
-        // Remove the image from Cloudinary
         await cloudinaryRemoveImage(category.image.publicId);
     }
 
-    // Return success message
     res.status(200).json({ message: 'Category has been deleted successfully', categoryId: category._id });
 });
+
 
  /**------------------------------------------
  *
@@ -103,46 +87,46 @@ module.exports.deleteCategoriesCtrl = asyncHandler(async (req, res) => {
  *   @method put
  *   @access private (only admin)
 ----------------------------------------- */
-
 module.exports.updateCategoryCtrl = asyncHandler(async (req, res) => {
-    // Validate the request body
     const { error } = validateUpdateCategory(req.body);
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
     }
 
-    // Check if the category exists
     let category = await Category.findById(req.params.id);
     if (!category) {
         return res.status(404).json({ message: 'Category not found' });
     }
 
-    // Update the category name
-    category.name = req.body.name;
+    if (req.body.name) category.name = req.body.name;
+    if (req.body.description) category.description = req.body.description;
 
-    // Check if a new image is provided
     if (req.file) {
-        // Remove the old image from Cloudinary if it exists
         if (category.image && category.image.publicId) {
             await cloudinaryRemoveImage(category.image.publicId);
         }
-        
-        // Upload the new image to Cloudinary
         const result = await cloudinaryUploadImage(req.file.path);
-
-        // Update the category's image information
         category.image = {
             url: result.secure_url,
             publicId: result.public_id
         };
     }
 
-    // Save the updated category
-    await category.save();
+    const updatedCategory = await category.save();
 
-    // Return success message
-    res.status(200).json({ message: 'Category updated successfully', category });
+    if (req.file) {
+        fs.unlink(req.file.path, (err) => {
+            if (err) {
+                console.error('Error deleting file:', err);
+            }
+        });
+    }
+
+    res.status(200).json({ message: 'Category updated successfully', category: updatedCategory });
 });
+
+
+
 
 /**------------------------------------------
  *  //api/categories/catId/dishes
@@ -152,23 +136,22 @@ module.exports.updateCategoryCtrl = asyncHandler(async (req, res) => {
  *   @access public 
 ----------------------------------------- */
 
-module.exports.getDishesByCategoryCtrl=asyncHandler(async(req,res)=>{
+module.exports.getDishesByCategoryCtrl = asyncHandler(async (req, res) => {
     try {
-        // Retrieve the category ID from the request parameters
         const categoryId = req.params.categoryId;
 
-        // Find all dishes with the specified category ID
-        const dishes = await dish.find({ category: categoryId });
+        if (!categoryId) {
+            return res.status(400).json({ message: 'Category ID is required' });
+        }
 
-        // Return the fetched dishes as a response
+        const dishes = await Dish.find({ category: categoryId });
+
         res.status(200).json(dishes);
     } catch (error) {
-        // Handle any errors that occur during the process
         console.error('Error fetching dishes by category:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
-})
-
+});
 /**------------------------------------------
  *  
  *   @desc  get single category
@@ -177,13 +160,12 @@ module.exports.getDishesByCategoryCtrl=asyncHandler(async(req,res)=>{
  *   @access public 
 ----------------------------------------- */
 
-module.exports.getSingleCategoryCtrl=asyncHandler( async (req,res,next) =>{
-    const id = req.params.id
-    
-    // Get category using the provided ID
-    const category = await Category.findById(id)
-    
-    if(!category){
-        return next(new CustomError(`Category not found`,404))
-    }else res.status(200).json(category);
-})  
+module.exports.getSingleCategoryCtrl = asyncHandler(async (req, res, next) => {
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
+        return res.status(404).json({ message: 'Category not found' });
+    }
+
+    res.status(200).json(category);
+});

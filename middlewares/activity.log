@@ -1,0 +1,28 @@
+User '663249f2717c0c3590a2a34f' performed action: GET /
+User '663249f2717c0c3590a2a34f' performed action: GET /api/orders
+User '663249f2717c0c3590a2a34f' performed action: GET /api/dishes/my-count/my-dishes
+User '663249f2717c0c3590a2a34f' performed action: GET /api/orders/my-count/my-orders
+User '663249f2717c0c3590a2a34f' performed action: GET /api/dishes
+User '663249f2717c0c3590a2a34f' performed action: GET /api/customers/profile
+User '663249f2717c0c3590a2a34f' performed action: GET /api/orders
+[04/06/2024 06:15:59] User '663249f2717c0c3590a2a34f' performed action: GET /api/orders
+[04/06/2024 06:15:59] User '663249f2717c0c3590a2a34f' performed action: GET /api/dishes/my-count/my-dishes
+[04/06/2024 06:15:59] User '663249f2717c0c3590a2a34f' performed action: GET /api/orders/my-count/my-orders
+[04/06/2024 06:21:48] User '663249f2717c0c3590a2a34f' performed action: POST /api/auth/login/admin
+[04/06/2024 06:21:52] User '663249f2717c0c3590a2a34f' performed action: GET /api/dishes
+[04/06/2024 06:21:58] User '663249f2717c0c3590a2a34f' performed action: GET /api/dishes
+[04/06/2024 06:21:59] User '663249f2717c0c3590a2a34f' performed action: GET /api/customers/profile
+[04/06/2024 06:22:00] User '663249f2717c0c3590a2a34f' performed action: GET /api/customers/profile
+[04/06/2024 06:22:00] User '663249f2717c0c3590a2a34f' performed action: GET /api/orders
+[04/06/2024 06:23:39] User '663249f2717c0c3590a2a34f' performed action: GET /api/customers/profile
+[04/06/2024 06:23:40] User '663249f2717c0c3590a2a34f' performed action: GET /api/orders
+[04/06/2024 06:23:42] User '663249f2717c0c3590a2a34f' performed action: GET /api/categories
+[04/06/2024 06:23:45] User '663249f2717c0c3590a2a34f' performed action: GET /api/categories
+[04/06/2024 06:23:47] User '663249f2717c0c3590a2a34f' performed action: GET /api/orders
+[04/06/2024 06:23:50] User '663249f2717c0c3590a2a34f' performed action: GET /api/orders
+[04/06/2024 06:23:56] User '663249f2717c0c3590a2a34f' performed action: GET /api/users/profile
+[04/06/2024 06:24:02] User '663249f2717c0c3590a2a34f' performed action: GET /api/orders
+[04/06/2024 06:24:02] User '663249f2717c0c3590a2a34f' performed action: GET /api/customers/profile
+[04/06/2024 06:24:03] User '663249f2717c0c3590a2a34f' performed action: GET /api/orders
+[04/06/2024 06:24:03] User '663249f2717c0c3590a2a34f' performed action: GET /api/orders/my-count/my-orders
+[04/06/2024 06:24:03] User '663249f2717c0c3590a2a34f' performed action: GET /api/dishes/my-count/my-dishes

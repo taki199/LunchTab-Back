@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
 
-const CategorySchema = new mongoose.Schema({
-  name:{
+// Define the category schema
+const categorySchema = new mongoose.Schema({
+  name: {
     type: String,
     required: true,
     unique: true,
     trim: true,
-    minlength: 3, // Minimum length for category name
+    minlength: 3,
   },
-  description:{
-  type:String,
-  minlength:10
+  description: {
+    type: String,
+    minlength: 10,
   },
   image: {
     type: Object,
@@ -25,16 +26,17 @@ const CategorySchema = new mongoose.Schema({
     default: false,
   },
 }, {
-  timestamps: true, 
+  timestamps: true,
 });
 
-const Category = mongoose.model('Category', CategorySchema);
+// Check if the model is already compiled
+const Category = mongoose.models.Category || mongoose.model('Category', categorySchema);
 
 // Validate Create Category
 function validateCreateCategory(obj) {
   const schema = Joi.object({
     name: Joi.string().required().label("Name").min(3).trim(),
-    description:Joi.string().label("Description").min(10).trim()
+    description: Joi.string().label("Description").min(10).trim(),
   });
   return schema.validate(obj);
 }
@@ -43,7 +45,7 @@ function validateCreateCategory(obj) {
 function validateUpdateCategory(obj) {
   const schema = Joi.object({
     name: Joi.string().required().label("Name").min(3).trim(),
-    description:Joi.string().label("Description").min(10).trim()
+    description: Joi.string().label("Description").min(10).trim(),
   });
   return schema.validate(obj);
 }
@@ -51,5 +53,5 @@ function validateUpdateCategory(obj) {
 module.exports = {
   Category,
   validateCreateCategory,
-  validateUpdateCategory
+  validateUpdateCategory,
 };

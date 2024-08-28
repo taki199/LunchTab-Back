@@ -13,7 +13,8 @@ router.get("/",getAllCategoriesCtrl)
 
 // //api/categories/:id
 router.delete("/:id",validateObjectId,verifyTokenAndAdmin,deleteCategoriesCtrl)
-router.put("/:id",validateObjectId,verifyTokenAndAdmin,photoUpload.single("image"),updateCategoryCtrl)
+// router.put("/:id",validateObjectId,verifyTokenAndAdmin,photoUpload.single("image"),updateCategoryCtrl)
+router.put("/:id",verifyTokenAndAdmin,photoUpload.single("image"),updateCategoryCtrl)
 router.get("/:id",validateObjectId,getSingleCategoryCtrl)
 
 // Route to fetch all dishes from a specific category
